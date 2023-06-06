@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
+import { json, redirect } from "react-router-dom";
+import { baseURL } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -33,8 +35,22 @@ function Signup() {
   // 입력된 이메일, 비밀번호 상태관리
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  console.log(email + "," + password);
+  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
+  // 회원가입 버튼 핸들러
+  const handleSignUp = async () => {
+    await fetch(`${baseURL}auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: {
+        email,
+        password,
+      },
+    })
+      .then((res) => console.log(res))
+      .then(alert("회원가입이 완료되었습니다."))
+      .then(redirect("/signin"))
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div className="signup">
@@ -76,7 +92,11 @@ function Signup() {
         {!isPwValid && (
           <div className="validCheck">비밀번호를 확인해주세요.</div>
         )}
-        <button disabled={!allValid} data-testid="signup-button">
+        <button
+          disabled={!allValid}
+          data-testid="signup-button"
+          onClick={handleSignUp}
+        >
           가입하기
         </button>
       </Container>
