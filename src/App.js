@@ -12,6 +12,7 @@ function App() {
     <React.Fragment>
       <GlobalStyle />
       <BrowserRouter>
+        <Nav></Nav>
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="/signup" element={<Signup />}></Route>
