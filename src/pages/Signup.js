@@ -35,6 +35,8 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  console.log(email + "," + password);
+
   return (
     <div className="signup">
       <Container>
@@ -48,6 +50,7 @@ function Signup() {
           onChange={(e) => {
             if (e.target.value.indexOf("@") !== -1) {
               setIsEmailValid(true);
+              setEmail(e.target.value);
             } else {
               setIsEmailValid(false);
             }
@@ -65,6 +68,7 @@ function Signup() {
           onChange={(e) => {
             if (e.target.value.length >= 8) {
               setIsPwValid(true);
+              setPassword(e.target.value);
             } else {
               setIsPwValid(false);
             }
