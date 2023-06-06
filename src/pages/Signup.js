@@ -15,7 +15,6 @@ const Container = styled.div`
 
   button {
     margin: 0 auto;
-
     height: 5vh;
     width: 20vw;
   }
