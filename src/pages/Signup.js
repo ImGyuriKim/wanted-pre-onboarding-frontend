@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
 import { json, redirect } from "react-router-dom";
-import { baseURL } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -37,19 +36,35 @@ function Signup() {
   const [password, setPassword] = useState("");
   const baseURL = "https://www.pre-onboarding-selection-task.shop/";
   // 회원가입 버튼 핸들러
-  const handleSignUp = async () => {
-    await fetch(`${baseURL}auth/signup`, {
+  const handleSignUp = () => {
+    fetch(`${baseURL}auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: {
-        email,
-        password,
-      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
     })
-      .then((res) => console.log(res))
-      .then(alert("회원가입이 완료되었습니다."))
-      .then(redirect("/signin"))
-      .catch((err) => console.log(err));
+      .then((res) => {
+        if (res.status === 400) {
+          throw res;
+        }
+
+        if (res.status === 201) {
+          alert("회원가입이 완료되었습니다.");
+          window.location.href = "/signin";
+        }
+      })
+      .catch((error) => {
+        error.text().then((msg) => {
+          const errMsg = JSON.parse(msg).message;
+          alert(errMsg);
+
+          if (errMsg === "동일한 이메일이 이미 존재합니다.") {
+            window.location.href = "/signin";
+          }
+        });
+      });
   };
 
   return (
