@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
-import { json, redirect } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -27,6 +26,12 @@ const Container = styled.div`
 `;
 
 function Signup() {
+  const access_token = localStorage.getItem("access_token");
+  // 리다이렉트 처리
+  if (access_token) {
+    alert("로그인이 완료되었습니다.");
+    window.location.href = "/todo";
+  }
   // 유효성 검사용 상태관리
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPwValid, setIsPwValid] = useState(false);
@@ -46,7 +51,7 @@ function Signup() {
       }),
     })
       .then((res) => {
-        if (res.status === 400) {
+        if (!res.ok) {
           throw res;
         }
 
