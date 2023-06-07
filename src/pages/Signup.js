@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
+import { json, redirect } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -33,6 +34,38 @@ function Signup() {
   // 입력된 이메일, 비밀번호 상태관리
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
+  // 회원가입 버튼 핸들러
+  const handleSignUp = () => {
+    fetch(`${baseURL}auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    })
+      .then((res) => {
+        if (res.status === 400) {
+          throw res;
+        }
+
+        if (res.status === 201) {
+          alert("회원가입이 완료되었습니다.");
+          window.location.href = "/signin";
+        }
+      })
+      .catch((error) => {
+        error.text().then((msg) => {
+          const errMsg = JSON.parse(msg).message;
+          alert(errMsg);
+
+          if (errMsg === "동일한 이메일이 이미 존재합니다.") {
+            window.location.href = "/signin";
+          }
+        });
+      });
+  };
 
   return (
     <div className="signup">
@@ -74,7 +107,11 @@ function Signup() {
         {!isPwValid && (
           <div className="validCheck">비밀번호를 확인해주세요.</div>
         )}
-        <button disabled={!allValid} data-testid="signup-button">
+        <button
+          disabled={!allValid}
+          data-testid="signup-button"
+          onClick={handleSignUp}
+        >
           가입하기
         </button>
       </Container>
