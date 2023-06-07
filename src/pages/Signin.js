@@ -26,6 +26,7 @@ const Container = styled.div`
 `;
 
 function Signin() {
+  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
   // 유효성 검사용 상태관리
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPwValid, setIsPwValid] = useState(false);
@@ -34,6 +35,41 @@ function Signin() {
   // 입력된 이메일, 비밀번호 상태관리
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // 로그인 버튼 핸들러
+  const handleSignIn = () => {
+    fetch(`${baseURL}auth/signin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          return res.json();
+        }
+
+        if (res.status === 401) {
+          throw res;
+        }
+      })
+      .then((res) => {
+        localStorage.setItem("access_token", res.access_token);
+        alert("로그인이 완료되었습니다.");
+        window.location.href = "/todo";
+      })
+      .catch((error) => {
+        error.text().then((msg) => {
+          const errMsg = JSON.parse(msg).message;
+          if (errMsg === "Unauthorized") {
+            alert("이메일과 비밀번호를 다시 한번 확인해주세요.");
+            window.location.href = "/signin";
+          }
+        });
+      });
+  };
 
   return (
     <div className="signin">
@@ -75,7 +111,11 @@ function Signin() {
         {!isPwValid && (
           <div className="validCheck">비밀번호를 확인해주세요.</div>
         )}
-        <button disabled={!allValid} data-testid="signin-button">
+        <button
+          disabled={!allValid}
+          data-testid="signin-button"
+          onClick={handleSignIn}
+        >
           로그인하기
         </button>
       </Container>
