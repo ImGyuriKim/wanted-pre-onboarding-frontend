@@ -46,7 +46,7 @@ function Signup() {
       }),
     })
       .then((res) => {
-        if (res.status === 400) {
+        if (!res.ok) {
           throw res;
         }
 
