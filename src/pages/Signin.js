@@ -29,13 +29,11 @@ function Signin() {
   // 유효성 검사용 상태관리
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPwValid, setIsPwValid] = useState(false);
+  const allValid = isEmailValid && isPwValid;
 
   // 입력된 이메일, 비밀번호 상태관리
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-
-function Signin() {
 
   return (
     <div className="signin">
@@ -77,7 +75,9 @@ function Signin() {
         {!isPwValid && (
           <div className="validCheck">비밀번호를 확인해주세요.</div>
         )}
-        <button data-testid="signin-button">로그인하기</button>
+        <button disabled={!allValid} data-testid="signin-button">
+          로그인하기
+        </button>
       </Container>
     </div>
   );
