@@ -6,6 +6,7 @@ const GlobalStyle = createGlobalStyle`
 }
 
 body {
+  background-color: lightgrey;
   font-family: 'Montserrat', sans-serif;
   line-height: 1.5;
 }
