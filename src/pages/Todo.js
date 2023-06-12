@@ -21,9 +21,14 @@ const ListContainer = styled.div`
   border: 1px solid grey;
   margin-bottom: 1rem;
 `;
+
 const NewContainer = styled.div`
   display: flex;
   height: 3vh;
+`;
+
+const EditContainer = styled.div`
+  display: flex;
 `;
 
 function Todo() {
@@ -81,7 +86,6 @@ function Todo() {
   };
 
   // 체크박스 핸들러 함수
-  const [isEditing, setIsEditing] = useState(false);
   const handleCheckBox = (e) => {
     const id = e.target.value;
     const todo = e.target.name;
@@ -116,6 +120,29 @@ function Todo() {
       }
     });
   };
+
+  // 수정 버튼 핸들러 함수
+  const [isEditing, setIsEditing] = useState(false);
+  const [todoId, setTodoId] = useState(0);
+  const [newTodo, setNewTodo] = useState("");
+
+  const handleEdit = (e) => {
+    e.target.value = todo;
+    setNewTodo(e.target.value);
+  };
+
+  const handleEditSubmit = (e) => {
+    console.log("제출버튼");
+    // newTodo -> Fetch 요청 작성
+    setIsEditing(false);
+  };
+
+  const handleEditCancel = (e) => {
+    console.log("취소버튼");
+    // 수정 내용 초기화
+    // 수정 모드 비활성화
+    setIsEditing(false);
+  };
   return (
     <Container>
       <h1>Todo List</h1>
@@ -134,8 +161,28 @@ function Todo() {
       <ul className="todoLists">
         {todos &&
           todos.map((todo) => {
-            return isEditing ? (
-              <div></div>
+            return isEditing && todoId === todo.id ? (
+              <EditContainer>
+                <li className="todoList">
+                  <input
+                    data-testid="modify-input"
+                    type="text"
+                    onKeyDown={(e) => handleEdit(e)}
+                  ></input>
+                  <button
+                    data-testid="submit-button"
+                    onClick={(e) => handleEditSubmit(e)}
+                  >
+                    제출
+                  </button>
+                  <button
+                    data-testid="cancel-button"
+                    onClick={(e) => handleEditCancel(e)}
+                  >
+                    취소
+                  </button>
+                </li>
+              </EditContainer>
             ) : (
               <ListContainer key={todo.id}>
                 <li className="todoList">
@@ -151,8 +198,10 @@ function Todo() {
                 </li>
                 <BtnContainer>
                   <button
+                    key={todo.id}
                     data-testid="modify-button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      setTodoId(todo.id);
                       setIsEditing(true);
                     }}
                   >
