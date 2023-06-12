@@ -61,7 +61,7 @@ const NewContainer = styled.div`
   background-color: lightblue;
 
   input {
-    width: 8rem;
+    width: 15rem;
     height: 30px;
     margin-top: 5px;
     margin-right: 10px;
@@ -79,7 +79,7 @@ const EditContainer = styled.div`
   font-size: large;
 
   input {
-    width: 8rem;
+    width: 15rem;
     height: 30px;
     margin-right: 10px;
     font-size: large;
