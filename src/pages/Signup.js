@@ -9,6 +9,7 @@ const Container = styled.div`
   height: auto;
   margin: 0 auto;
   margin-top: 10vh;
+  margin-bottom: 10vh;
   background: white;
   padding: 10vh;
   border-radius: 10px;
