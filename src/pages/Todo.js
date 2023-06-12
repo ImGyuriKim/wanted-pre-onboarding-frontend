@@ -154,51 +154,19 @@ function Todo() {
       });
   };
 
-  // 체크박스 핸들러 함수
-  const handleCheckBox = (e) => {
-    const id = todoId;
-    fetch(`${baseURL}todos/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-      body: JSON.stringify({
-        ...fullTodo,
-        todo: fullTodo.todo,
-        isCompleted: fullTodo.isCompleted,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.status === 200) {
-          alert("수정되었습니다.");
-          window.location.href = "/todo";
-        } else {
-          throw res;
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
-  // 수정 버튼 핸들러 함수
-  const handleEdit = (e) => {
-    setFullTodo({ ...fullTodo, todo: e.target.value });
-  };
-
-  // 수정 제출 핸들러 함수
-  const handleEditSubmit = (e) => {
+  // 수정 요청 핸들러 함수 - PUT 요청
+  const handlePutRequset = async (e) => {
     const id = e.target.value;
-    fetch(`${baseURL}todos/${id}`, {
+
+    await fetch(`${baseURL}todos/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        ...fullTodo,
-        todo: fullTodo.todo,
         isCompleted: fullTodo.isCompleted,
+        todo: fullTodo.todo,
       }),
     })
       .then((res) => res.json())
@@ -213,11 +181,11 @@ function Todo() {
 
   // 수정 취소 핸들러 함수
   const handleEditCancel = (e) => {
-    setFullTodo({ ...fullTodo, tood: e.target.defaultValue });
+    setFullTodo({ ...fullTodo, todo: e.target.defaultValue });
     setIsEditing(false);
   };
 
-  // 삭제 핸들러 함수
+  // 삭제 핸들러 함수 - DELETE 요청
   const handleDelete = (e) => {
     const id = e.target.value;
     fetch(`${baseURL}todos/${id}`, {
@@ -260,14 +228,19 @@ function Todo() {
                       data-testid="modify-input"
                       type="text"
                       defaultValue={todo.todo}
-                      onChange={(e) => handleEdit(e)}
+                      onChange={(e) =>
+                        setFullTodo({
+                          ...fullTodo,
+                          todo: e.target.value,
+                          isCompleted: todo.isCompleted,
+                        })
+                      }
                     ></input>
-
                     <button
                       checked={todo.isCompleted}
                       value={todo.id}
                       data-testid="submit-button"
-                      onClick={(e) => handleEditSubmit(e)}
+                      onClick={(e) => handlePutRequset(e)}
                     >
                       제출
                     </button>
@@ -288,13 +261,15 @@ function Todo() {
                     {todo.todo}
                     <input
                       type="checkbox"
-                      value={todo.todo}
+                      checked={fullTodo.isCompleted}
+                      value={todo.id}
                       onChange={(e) => {
                         setFullTodo({
                           ...fullTodo,
+                          todo: todo.todo,
                           isCompleted: !todo.isCompleted,
                         });
-                        handleCheckBox(e);
+                        handlePutRequset(e);
                       }}
                     ></input>
                   </label>
