@@ -124,20 +124,13 @@ function Todo() {
   // ? useState 상태 모음
   const [todos, setTodos] = useState([]);
   const [todoText, setTodoText] = useState("");
-  //! todoId를 todo 객체에 있는 것으로 대체하기
   const [todoId, setTodoId] = useState(0);
-  const [todo, setTodo] = useState({
-    id: 0,
-    todo: "",
-    isCompleted: false,
-    userId: 0,
-  });
+  const [fullTodo, setFullTodo] = useState({});
   const [isEditing, setIsEditing] = useState(false);
 
   // ? 핸들러 함수 모음
 
   // 새로운 TODO 생성 - POST 요청
-  //! 응답을 todo 객체로 만들어 상태관리하기
   const handleAddButton = () => {
     fetch(`${baseURL}todos`, {
       method: "POST",
@@ -146,16 +139,22 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        todoText,
+        todo: todoText,
       }),
-    }).then((res) => {
-      console.log(res);
-      window.location.reload();
-    });
+    })
+      .then((res) => {
+        if (res.status === 201) {
+          return res.json();
+        }
+      })
+      .then((res) => {
+        setFullTodo(res);
+        alert("추가되었습니다.");
+        window.location.reload();
+      });
   };
 
   // 체크박스 핸들러 함수
-  //! todo 객체로 수정 - 체크박스 수정 요청
   const handleCheckBox = (e) => {
     const id = e.target.value;
     const todo = e.target.name;
@@ -166,7 +165,7 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        todo: todo,
+        ...fullTodo,
         isCompleted: e.target.checked,
       }),
     })
@@ -183,9 +182,8 @@ function Todo() {
   };
 
   // 수정 버튼 핸들러 함수
-  //! todo 객체로 수정
   const handleEdit = (e) => {
-    setTodoText(e.target.value);
+    setFullTodo({ ...fullTodo, todo: e.target.value });
   };
 
   // 수정 제출 핸들러 함수
@@ -199,8 +197,8 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        //! todo 객체로 수정
-        todo: todo,
+        ...fullTodo,
+        todo: fullTodo.todo,
         isCompleted: e.target.checked,
       }),
     })
@@ -215,9 +213,8 @@ function Todo() {
   };
 
   // 수정 취소 핸들러 함수
-  //! todo 객체로 수정
   const handleEditCancel = (e) => {
-    setTodoText(e.target.defaultValue);
+    setFullTodo({ ...fullTodo, tood: e.target.defaultValue });
     setIsEditing(false);
   };
 
@@ -255,8 +252,6 @@ function Todo() {
       <ul className="todoLists">
         {todos &&
           todos.map((todo) => {
-            console.log(todo);
-
             return isEditing && todoId === todo.id ? (
               <ListContainer>
                 <EditContainer>
