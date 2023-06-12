@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import Input from "../components/Input";
 
 const Container = styled.div`
   display: flex;
@@ -21,6 +20,10 @@ const ListContainer = styled.div`
   padding: 10px;
   border: 1px solid grey;
   margin-bottom: 1rem;
+`;
+const NewContainer = styled.div`
+  display: flex;
+  height: 3vh;
 `;
 
 function Todo() {
@@ -116,12 +119,23 @@ function Todo() {
   return (
     <Container>
       <h1>Todo List</h1>
-      <Input setTodo={setTodo} handleAddButton={handleAddButton} />
+      <NewContainer>
+        <input
+          data-testid="new-todo-input"
+          onChange={(e) => {
+            setTodo(e.target.value);
+          }}
+        />
+        <button data-testid="new-todo-add-button" onClick={handleAddButton}>
+          추가
+        </button>
+      </NewContainer>
+
       <ul className="todoLists">
         {todos &&
           todos.map((todo) => {
             return isEditing ? (
-              <Input></Input>
+              <div></div>
             ) : (
               <ListContainer key={todo.id}>
                 <li className="todoList">
