@@ -90,13 +90,13 @@ function Todo() {
   const access_token = localStorage.getItem("access_token");
   const baseURL = "https://www.pre-onboarding-selection-task.shop/";
 
-  // 리다이렉트 처리
+  // 로그인 여부에 따른 리다이렉트 처리
   if (!access_token) {
     alert("로그인 후 이용해주세요.");
     window.location.href = "/signin";
   }
+
   // 기존 TODO 조회 - GET 요청
-  const [todos, setTodos] = useState([]);
   useEffect(() => {
     const getTodos = async () => {
       await fetch(`${baseURL}todos`, {
@@ -121,9 +121,22 @@ function Todo() {
     getTodos();
   }, [access_token]);
 
-  // 새로운 TODO 생성 - POST 요청
-  const [todo, setTodo] = useState("");
+  // ? useState 상태 모음
+  const [todos, setTodos] = useState([]);
+  const [todoText, setTodoText] = useState("");
+  //! todoId를 todo 객체에 있는 것으로 대체하기
+  const [todoId, setTodoId] = useState(0);
+  const [todo, setTodo] = useState({
+    id: 0,
+    todo: "",
+    isCompleted: false,
+    userId: 0,
+  });
+  const [isEditing, setIsEditing] = useState(false);
 
+  // ? 핸들러 함수 모음
+
+  // 새로운 TODO 생성 - POST 요청
   //! 응답을 todo 객체로 만들어 상태관리하기
   const handleAddButton = () => {
     fetch(`${baseURL}todos`, {
@@ -133,7 +146,7 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        todo,
+        todoText,
       }),
     }).then((res) => {
       console.log(res);
@@ -169,32 +182,13 @@ function Todo() {
       .catch((error) => console.log(error));
   };
 
-  // 삭제 핸들러 함수
-  const handleDelete = (e) => {
-    const id = e.target.value;
-    fetch(`${baseURL}todos/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    }).then((res) => {
-      if (res.status === 204) {
-        alert("삭제되었습니다.");
-        window.location.reload();
-      }
-    });
-  };
-
   // 수정 버튼 핸들러 함수
-  const [isEditing, setIsEditing] = useState(false);
-  //! todoId를 todo 객체에 있는 것으로 대체하기
-  const [todoId, setTodoId] = useState(0);
-
   //! todo 객체로 수정
   const handleEdit = (e) => {
-    setTodo(e.target.value);
+    setTodoText(e.target.value);
   };
 
+  // 수정 제출 핸들러 함수
   const handleEditSubmit = (e) => {
     const id = e.target.value;
     // newTodo -> Fetch 요청 작성
@@ -220,10 +214,27 @@ function Todo() {
     setIsEditing(false);
   };
 
+  // 수정 취소 핸들러 함수
   //! todo 객체로 수정
   const handleEditCancel = (e) => {
-    setTodo(e.target.defaultValue);
+    setTodoText(e.target.defaultValue);
     setIsEditing(false);
+  };
+
+  // 삭제 핸들러 함수
+  const handleDelete = (e) => {
+    const id = e.target.value;
+    fetch(`${baseURL}todos/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }).then((res) => {
+      if (res.status === 204) {
+        alert("삭제되었습니다.");
+        window.location.reload();
+      }
+    });
   };
 
   return (
@@ -233,7 +244,7 @@ function Todo() {
         <input
           data-testid="new-todo-input"
           onChange={(e) => {
-            setTodo(e.target.value);
+            setTodoText(e.target.value);
           }}
         />
         <button data-testid="new-todo-add-button" onClick={handleAddButton}>
