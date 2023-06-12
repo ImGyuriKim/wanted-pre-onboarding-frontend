@@ -5,8 +5,23 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid grey;
-  margin: 5vh;
+  justify-content: center;
+  width: 60vw;
+  height: auto;
+  margin: 0 auto;
+  margin-top: 10vh;
+  margin-bottom: 10vh;
+  background: white;
+  border-radius: 10px;
+
+  button {
+    background-color: lightgreen;
+    border: none;
+    margin: 5px;
+    width: auto;
+    height: 30px;
+    font-size: large;
+  }
 `;
 
 const BtnContainer = styled.div`
@@ -15,20 +30,60 @@ const BtnContainer = styled.div`
 
 const ListContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  align-items: center;
+  background: beige;
+  border-radius: 5px;
+  justify-content: right;
+  margin-left: -40px;
   list-style-type: none;
-  padding: 10px;
-  border: 1px solid grey;
+  padding: 15px;
   margin-bottom: 1rem;
+  width: 40vw;
+  font-size: large;
+
+  label {
+    margin-right: 10px;
+  }
+
+  input {
+    margin-left: 20px;
+  }
 `;
 
 const NewContainer = styled.div`
   display: flex;
-  height: 3vh;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  width: 40vw;
+  border-radius: 5px;
+  margin-bottom: 30px;
+  background-color: lightblue;
+
+  input {
+    width: 15rem;
+    height: 30px;
+    margin-top: 5px;
+    margin-right: 10px;
+    font-size: large;
+  }
 `;
 
 const EditContainer = styled.div`
   display: flex;
+  background: beige;
+  border-radius: 5px;
+  justify-content: right;
+  list-style-type: none;
+  margin-bottom: 1rem;
+  font-size: large;
+
+  input {
+    width: 15rem;
+    height: 30px;
+    margin-right: 10px;
+    font-size: large;
+  }
 `;
 
 function Todo() {
