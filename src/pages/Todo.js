@@ -90,13 +90,13 @@ function Todo() {
   const access_token = localStorage.getItem("access_token");
   const baseURL = "https://www.pre-onboarding-selection-task.shop/";
 
-  // 리다이렉트 처리
+  // 로그인 여부에 따른 리다이렉트 처리
   if (!access_token) {
     alert("로그인 후 이용해주세요.");
     window.location.href = "/signin";
   }
+
   // 기존 TODO 조회 - GET 요청
-  const [todos, setTodos] = useState([]);
   useEffect(() => {
     const getTodos = async () => {
       await fetch(`${baseURL}todos`, {
@@ -121,9 +121,16 @@ function Todo() {
     getTodos();
   }, [access_token]);
 
-  // 새로운 TODO 생성 - POST 요청
-  const [todo, setTodo] = useState("");
+  // ? useState 상태 모음
+  const [todos, setTodos] = useState([]);
+  const [todoText, setTodoText] = useState("");
+  const [todoId, setTodoId] = useState(0);
+  const [fullTodo, setFullTodo] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
 
+  // ? 핸들러 함수 모음
+
+  // 새로운 TODO 생성 - POST 요청
   const handleAddButton = () => {
     fetch(`${baseURL}todos`, {
       method: "POST",
@@ -132,18 +139,24 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        todo,
+        todo: todoText,
       }),
-    }).then((res) => {
-      console.log(res);
-      window.location.reload();
-    });
+    })
+      .then((res) => {
+        if (res.status === 201) {
+          return res.json();
+        }
+      })
+      .then((res) => {
+        console.log(res);
+        alert("추가되었습니다.");
+        window.location.reload();
+      });
   };
 
   // 체크박스 핸들러 함수
   const handleCheckBox = (e) => {
-    const id = e.target.value;
-    const todo = e.target.name;
+    const id = todoId;
     fetch(`${baseURL}todos/${id}`, {
       method: "PUT",
       headers: {
@@ -151,8 +164,9 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        todo: todo,
-        isCompleted: e.target.checked,
+        ...fullTodo,
+        todo: fullTodo.todo,
+        isCompleted: fullTodo.isCompleted,
       }),
     })
       .then((res) => res.json())
@@ -165,6 +179,42 @@ function Todo() {
         }
       })
       .catch((error) => console.log(error));
+  };
+
+  // 수정 버튼 핸들러 함수
+  const handleEdit = (e) => {
+    setFullTodo({ ...fullTodo, todo: e.target.value });
+  };
+
+  // 수정 제출 핸들러 함수
+  const handleEditSubmit = (e) => {
+    const id = e.target.value;
+    fetch(`${baseURL}todos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+      body: JSON.stringify({
+        ...fullTodo,
+        todo: fullTodo.todo,
+        isCompleted: fullTodo.isCompleted,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        alert("수정되었습니다");
+        window.location.href = "/todo";
+        console.log(res);
+      })
+      .catch((error) => console.log(error));
+    setIsEditing(false);
+  };
+
+  // 수정 취소 핸들러 함수
+  const handleEditCancel = (e) => {
+    setFullTodo({ ...fullTodo, tood: e.target.defaultValue });
+    setIsEditing(false);
   };
 
   // 삭제 핸들러 함수
@@ -183,51 +233,15 @@ function Todo() {
     });
   };
 
-  // 수정 버튼 핸들러 함수
-  const [isEditing, setIsEditing] = useState(false);
-  const [todoId, setTodoId] = useState(0);
-
-  const handleEdit = (e) => {
-    setTodo(e.target.value);
-  };
-
-  const handleEditSubmit = (e) => {
-    const id = e.target.value;
-    // newTodo -> Fetch 요청 작성
-    fetch(`${baseURL}todos/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-      body: JSON.stringify({
-        todo: todo,
-        isCompleted: e.target.checked,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        alert("수정되었습니다");
-        window.location.href = "/todo";
-        console.log(res);
-      })
-      .catch((error) => console.log(error));
-    setIsEditing(false);
-  };
-
-  const handleEditCancel = (e) => {
-    setTodo(e.target.defaultValue);
-    setIsEditing(false);
-  };
-
   return (
     <Container>
       <h1>Todo List</h1>
       <NewContainer>
         <input
           data-testid="new-todo-input"
+          type="text"
           onChange={(e) => {
-            setTodo(e.target.value);
+            setTodoText(e.target.value);
           }}
         />
         <button data-testid="new-todo-add-button" onClick={handleAddButton}>
@@ -239,7 +253,7 @@ function Todo() {
         {todos &&
           todos.map((todo) => {
             return isEditing && todoId === todo.id ? (
-              <ListContainer>
+              <ListContainer key={todo.id}>
                 <EditContainer>
                   <li className="todoList">
                     <input
@@ -274,9 +288,14 @@ function Todo() {
                     {todo.todo}
                     <input
                       type="checkbox"
-                      value={todo.id}
-                      name={todo.todo}
-                      onChange={(e) => handleCheckBox(e)}
+                      value={todo.todo}
+                      onChange={(e) => {
+                        setFullTodo({
+                          ...fullTodo,
+                          isCompleted: !todo.isCompleted,
+                        });
+                        handleCheckBox(e);
+                      }}
                     ></input>
                   </label>
                 </li>
