@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import Input from "../components/Input";
 
 const Container = styled.div`
   display: flex;
@@ -21,6 +20,15 @@ const ListContainer = styled.div`
   padding: 10px;
   border: 1px solid grey;
   margin-bottom: 1rem;
+`;
+
+const NewContainer = styled.div`
+  display: flex;
+  height: 3vh;
+`;
+
+const EditContainer = styled.div`
+  display: flex;
 `;
 
 function Todo() {
@@ -78,7 +86,6 @@ function Todo() {
   };
 
   // 체크박스 핸들러 함수
-  const [isEditing, setIsEditing] = useState(false);
   const handleCheckBox = (e) => {
     const id = e.target.value;
     const todo = e.target.name;
@@ -94,7 +101,14 @@ function Todo() {
       }),
     })
       .then((res) => res.json())
-      .then((res) => console.log(res))
+      .then((res) => {
+        if (res.status === 200) {
+          alert("수정되었습니다.");
+          window.location.href = "/todo";
+        } else {
+          throw res;
+        }
+      })
       .catch((error) => console.log(error));
   };
 
@@ -113,15 +127,91 @@ function Todo() {
       }
     });
   };
+
+  // 수정 버튼 핸들러 함수
+  const [isEditing, setIsEditing] = useState(false);
+  const [todoId, setTodoId] = useState(0);
+
+  const handleEdit = (e) => {
+    setTodo(e.target.value);
+  };
+
+  const handleEditSubmit = (e) => {
+    const id = e.target.value;
+    // newTodo -> Fetch 요청 작성
+    fetch(`${baseURL}todos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+      body: JSON.stringify({
+        todo: todo,
+        isCompleted: e.target.checked,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        alert("수정되었습니다");
+        window.location.href = "/todo";
+        console.log(res);
+      })
+      .catch((error) => console.log(error));
+    setIsEditing(false);
+  };
+
+  const handleEditCancel = (e) => {
+    setTodo(e.target.defaultValue);
+    setIsEditing(false);
+  };
+
   return (
     <Container>
       <h1>Todo List</h1>
-      <Input setTodo={setTodo} handleAddButton={handleAddButton} />
+      <NewContainer>
+        <input
+          data-testid="new-todo-input"
+          onChange={(e) => {
+            setTodo(e.target.value);
+          }}
+        />
+        <button data-testid="new-todo-add-button" onClick={handleAddButton}>
+          추가
+        </button>
+      </NewContainer>
+
       <ul className="todoLists">
         {todos &&
           todos.map((todo) => {
-            return isEditing ? (
-              <Input></Input>
+            return isEditing && todoId === todo.id ? (
+              <ListContainer>
+                <EditContainer>
+                  <li className="todoList">
+                    <input
+                      data-testid="modify-input"
+                      type="text"
+                      defaultValue={todo.todo}
+                      onChange={(e) => handleEdit(e)}
+                    ></input>
+
+                    <button
+                      checked={todo.isCompleted}
+                      value={todo.id}
+                      data-testid="submit-button"
+                      onClick={(e) => handleEditSubmit(e)}
+                    >
+                      제출
+                    </button>
+                    <button
+                      defaultValue={todo.todo}
+                      data-testid="cancel-button"
+                      onClick={(e) => handleEditCancel(e)}
+                    >
+                      취소
+                    </button>
+                  </li>
+                </EditContainer>
+              </ListContainer>
             ) : (
               <ListContainer key={todo.id}>
                 <li className="todoList">
@@ -137,8 +227,10 @@ function Todo() {
                 </li>
                 <BtnContainer>
                   <button
+                    key={todo.id}
                     data-testid="modify-button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      setTodoId(todo.id);
                       setIsEditing(true);
                     }}
                   >
