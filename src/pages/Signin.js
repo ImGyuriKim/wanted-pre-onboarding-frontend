@@ -29,7 +29,7 @@ function Signin() {
   const access_token = localStorage.getItem("access_token");
   // 리다이렉트 처리
   if (access_token) {
-    alert("로그인이 완료되었습니다.");
+    alert("이미 로그인되어있습니다. Todo 페이지로 이동합니다.");
     window.location.href = "/todo";
   }
   const baseURL = "https://www.pre-onboarding-selection-task.shop/";
