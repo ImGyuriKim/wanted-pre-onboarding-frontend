@@ -124,6 +124,7 @@ function Todo() {
   // 새로운 TODO 생성 - POST 요청
   const [todo, setTodo] = useState("");
 
+  //! 응답을 todo 객체로 만들어 상태관리하기
   const handleAddButton = () => {
     fetch(`${baseURL}todos`, {
       method: "POST",
@@ -141,6 +142,7 @@ function Todo() {
   };
 
   // 체크박스 핸들러 함수
+  //! todo 객체로 수정 - 체크박스 수정 요청
   const handleCheckBox = (e) => {
     const id = e.target.value;
     const todo = e.target.name;
@@ -185,8 +187,10 @@ function Todo() {
 
   // 수정 버튼 핸들러 함수
   const [isEditing, setIsEditing] = useState(false);
+  //! todoId를 todo 객체에 있는 것으로 대체하기
   const [todoId, setTodoId] = useState(0);
 
+  //! todo 객체로 수정
   const handleEdit = (e) => {
     setTodo(e.target.value);
   };
@@ -201,6 +205,7 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
+        //! todo 객체로 수정
         todo: todo,
         isCompleted: e.target.checked,
       }),
@@ -215,6 +220,7 @@ function Todo() {
     setIsEditing(false);
   };
 
+  //! todo 객체로 수정
   const handleEditCancel = (e) => {
     setTodo(e.target.defaultValue);
     setIsEditing(false);
@@ -238,6 +244,8 @@ function Todo() {
       <ul className="todoLists">
         {todos &&
           todos.map((todo) => {
+            console.log(todo);
+
             return isEditing && todoId === todo.id ? (
               <ListContainer>
                 <EditContainer>
@@ -274,6 +282,7 @@ function Todo() {
                     {todo.todo}
                     <input
                       type="checkbox"
+                      defaultChecked={todo.todo}
                       value={todo.id}
                       name={todo.todo}
                       onChange={(e) => handleCheckBox(e)}
