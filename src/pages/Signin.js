@@ -5,16 +5,28 @@ import { useState } from "react";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 40vw;
+  width: 60vw;
   height: auto;
   margin: 0 auto;
+  margin-top: 10vh;
+  background: white;
+  padding: 10vh;
+  border-radius: 10px;
 
+  label {
+    font-size: larger;
+    font-weight: bold;
+    color: grey;
+    margin-bottom: 10px;
+  }
   input {
     height: 5vh;
+    margin-bottom: 10px;
   }
 
   button {
     margin: 0 auto;
+    margin-top: 25px;
     height: 5vh;
     width: 20vw;
   }
