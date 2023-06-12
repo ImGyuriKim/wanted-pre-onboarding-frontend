@@ -125,9 +125,8 @@ function Todo() {
   const [todos, setTodos] = useState([]);
   const [todoText, setTodoText] = useState("");
   const [todoId, setTodoId] = useState(0);
-  const [fullTodo, setFullTodo] = useState({});
+  const [checkedTodoId, setCheckedTodoId] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-
   // ? 핸들러 함수 모음
 
   // 새로운 TODO 생성 - POST 요청
@@ -155,9 +154,8 @@ function Todo() {
   };
 
   // 수정 요청 핸들러 함수 - PUT 요청
-  const handlePutRequset = async (e) => {
-    const id = e.target.value;
-
+  const handlePutRequset = async (id) => {
+    const todo = todos.find((t) => t.id === Number(id));
     await fetch(`${baseURL}todos/${id}`, {
       method: "PUT",
       headers: {
@@ -165,13 +163,13 @@ function Todo() {
         Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify({
-        isCompleted: fullTodo.isCompleted,
-        todo: fullTodo.todo,
+        isCompleted: todo.isCompleted,
+        todo: todo.todo,
       }),
     })
       .then((res) => res.json())
       .then((res) => {
-        alert("수정되었습니다");
+        alert("수정되었습니다.");
         window.location.href = "/todo";
         console.log(res);
       })
@@ -181,7 +179,6 @@ function Todo() {
 
   // 수정 취소 핸들러 함수
   const handleEditCancel = (e) => {
-    setFullTodo({ ...fullTodo, todo: e.target.defaultValue });
     setIsEditing(false);
   };
 
@@ -200,6 +197,14 @@ function Todo() {
       }
     });
   };
+
+  // 가장 최근 수정 작업이 일어난 todo의 id로 네트워크에 변경 작업 요청
+  useEffect(() => {
+    // 초기값 === 0, 0이 아닐 때만 실행되도록
+    if (checkedTodoId !== 0) {
+      handlePutRequset(checkedTodoId);
+    }
+  }, [checkedTodoId]);
 
   return (
     <Container>
@@ -227,25 +232,27 @@ function Todo() {
                     <input
                       data-testid="modify-input"
                       type="text"
-                      defaultValue={todo.todo}
+                      value={todo.todo}
                       onChange={(e) =>
-                        setFullTodo({
-                          ...fullTodo,
-                          todo: e.target.value,
-                          isCompleted: todo.isCompleted,
-                        })
+                        setTodos(
+                          todos.map((t) => {
+                            if (t.id === todo.id) {
+                              return { ...t, todo: e.target.value };
+                            } else return t;
+                          })
+                        )
                       }
                     ></input>
                     <button
                       checked={todo.isCompleted}
                       value={todo.id}
                       data-testid="submit-button"
-                      onClick={(e) => handlePutRequset(e)}
+                      onClick={(e) => handlePutRequset(e.target.value)}
                     >
                       제출
                     </button>
                     <button
-                      defaultValue={todo.todo}
+                      // defaultValue={todo.todo}
                       data-testid="cancel-button"
                       onClick={(e) => handleEditCancel(e)}
                     >
@@ -261,15 +268,17 @@ function Todo() {
                     {todo.todo}
                     <input
                       type="checkbox"
-                      checked={fullTodo.isCompleted}
+                      checked={todo.isCompleted}
                       value={todo.id}
                       onChange={(e) => {
-                        setFullTodo({
-                          ...fullTodo,
-                          todo: todo.todo,
-                          isCompleted: !todo.isCompleted,
-                        });
-                        handlePutRequset(e);
+                        setTodos(
+                          todos.map((t) => {
+                            if (t.id === todo.id) {
+                              return { ...t, isCompleted: !t.isCompleted };
+                            } else return t;
+                          })
+                        );
+                        setCheckedTodoId(e.target.value);
                       }}
                     ></input>
                   </label>
