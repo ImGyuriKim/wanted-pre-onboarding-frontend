@@ -148,7 +148,7 @@ function Todo() {
         }
       })
       .then((res) => {
-        setFullTodo(res);
+        console.log(res);
         alert("추가되었습니다.");
         window.location.reload();
       });
@@ -156,8 +156,7 @@ function Todo() {
 
   // 체크박스 핸들러 함수
   const handleCheckBox = (e) => {
-    const id = e.target.value;
-    const todo = e.target.name;
+    const id = todoId;
     fetch(`${baseURL}todos/${id}`, {
       method: "PUT",
       headers: {
@@ -166,7 +165,8 @@ function Todo() {
       },
       body: JSON.stringify({
         ...fullTodo,
-        isCompleted: e.target.checked,
+        todo: fullTodo.todo,
+        isCompleted: fullTodo.isCompleted,
       }),
     })
       .then((res) => res.json())
@@ -189,7 +189,6 @@ function Todo() {
   // 수정 제출 핸들러 함수
   const handleEditSubmit = (e) => {
     const id = e.target.value;
-    // newTodo -> Fetch 요청 작성
     fetch(`${baseURL}todos/${id}`, {
       method: "PUT",
       headers: {
@@ -199,7 +198,7 @@ function Todo() {
       body: JSON.stringify({
         ...fullTodo,
         todo: fullTodo.todo,
-        isCompleted: e.target.checked,
+        isCompleted: fullTodo.isCompleted,
       }),
     })
       .then((res) => res.json())
@@ -240,6 +239,7 @@ function Todo() {
       <NewContainer>
         <input
           data-testid="new-todo-input"
+          type="text"
           onChange={(e) => {
             setTodoText(e.target.value);
           }}
@@ -253,7 +253,7 @@ function Todo() {
         {todos &&
           todos.map((todo) => {
             return isEditing && todoId === todo.id ? (
-              <ListContainer>
+              <ListContainer key={todo.id}>
                 <EditContainer>
                   <li className="todoList">
                     <input
@@ -288,10 +288,14 @@ function Todo() {
                     {todo.todo}
                     <input
                       type="checkbox"
-                      defaultChecked={todo.todo}
-                      value={todo.id}
-                      name={todo.todo}
-                      onChange={(e) => handleCheckBox(e)}
+                      value={todo.todo}
+                      onChange={(e) => {
+                        setFullTodo({
+                          ...fullTodo,
+                          isCompleted: !todo.isCompleted,
+                        });
+                        handleCheckBox(e);
+                      }}
                     ></input>
                   </label>
                 </li>
