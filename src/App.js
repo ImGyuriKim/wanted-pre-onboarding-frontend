@@ -5,6 +5,7 @@ import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
 import Todo from "./pages/Todo";
 import Nav from "./components/Nav";
+import Logout from "./components/Logout";
 import React from "react";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <GlobalStyle />
       <BrowserRouter>
         <Nav></Nav>
+        <Logout></Logout>
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="/signup" element={<Signup />}></Route>
