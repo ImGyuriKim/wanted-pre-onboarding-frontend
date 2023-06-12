@@ -101,7 +101,14 @@ function Todo() {
       }),
     })
       .then((res) => res.json())
-      .then((res) => console.log(res))
+      .then((res) => {
+        if (res.status === 200) {
+          alert("수정되었습니다.");
+          window.location.href = "/todo";
+        } else {
+          throw res;
+        }
+      })
       .catch((error) => console.log(error));
   };
 
@@ -124,25 +131,40 @@ function Todo() {
   // 수정 버튼 핸들러 함수
   const [isEditing, setIsEditing] = useState(false);
   const [todoId, setTodoId] = useState(0);
-  const [newTodo, setNewTodo] = useState("");
 
   const handleEdit = (e) => {
-    e.target.value = todo;
-    setNewTodo(e.target.value);
+    setTodo(e.target.value);
   };
 
   const handleEditSubmit = (e) => {
-    console.log("제출버튼");
+    const id = e.target.value;
     // newTodo -> Fetch 요청 작성
+    fetch(`${baseURL}todos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+      body: JSON.stringify({
+        todo: todo,
+        isCompleted: e.target.checked,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        alert("수정되었습니다");
+        window.location.href = "/todo";
+        console.log(res);
+      })
+      .catch((error) => console.log(error));
     setIsEditing(false);
   };
 
   const handleEditCancel = (e) => {
-    console.log("취소버튼");
-    // 수정 내용 초기화
-    // 수정 모드 비활성화
+    setTodo(e.target.defaultValue);
     setIsEditing(false);
   };
+
   return (
     <Container>
       <h1>Todo List</h1>
@@ -162,27 +184,34 @@ function Todo() {
         {todos &&
           todos.map((todo) => {
             return isEditing && todoId === todo.id ? (
-              <EditContainer>
-                <li className="todoList">
-                  <input
-                    data-testid="modify-input"
-                    type="text"
-                    onKeyDown={(e) => handleEdit(e)}
-                  ></input>
-                  <button
-                    data-testid="submit-button"
-                    onClick={(e) => handleEditSubmit(e)}
-                  >
-                    제출
-                  </button>
-                  <button
-                    data-testid="cancel-button"
-                    onClick={(e) => handleEditCancel(e)}
-                  >
-                    취소
-                  </button>
-                </li>
-              </EditContainer>
+              <ListContainer>
+                <EditContainer>
+                  <li className="todoList">
+                    <input
+                      data-testid="modify-input"
+                      type="text"
+                      defaultValue={todo.todo}
+                      onChange={(e) => handleEdit(e)}
+                    ></input>
+
+                    <button
+                      checked={todo.isCompleted}
+                      value={todo.id}
+                      data-testid="submit-button"
+                      onClick={(e) => handleEditSubmit(e)}
+                    >
+                      제출
+                    </button>
+                    <button
+                      defaultValue={todo.todo}
+                      data-testid="cancel-button"
+                      onClick={(e) => handleEditCancel(e)}
+                    >
+                      취소
+                    </button>
+                  </li>
+                </EditContainer>
+              </ListContainer>
             ) : (
               <ListContainer key={todo.id}>
                 <li className="todoList">
