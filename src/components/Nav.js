@@ -5,7 +5,18 @@ import Logout from "./Logout";
 
 const Conatiner = styled.div`
   display: flex;
-  justify-content: right;
+  position: relative;
+  left: 60vh;
+  border-radius: 10px;
+  margin-top: 5vh;
+  background-color: lightblue;
+  width: max-content;
+
+  a {
+    padding: 2vw;
+    font-size: 20px;
+    color: black;
+  }
 `;
 function Nav() {
   const access_token = localStorage.getItem("access_token");
@@ -13,8 +24,8 @@ function Nav() {
     <Conatiner>
       {access_token ? <Logout /> : <></>}
       <Link to="/">Home</Link>
-      <Link to="/signin">Sign In 로그인</Link>
-      <Link to="/signup">Sign Up 회원가입</Link>
+      <Link to="/signin">로그인</Link>
+      <Link to="/signup">회원가입</Link>
       <Link to="/todo">Todo</Link>
     </Conatiner>
   );
