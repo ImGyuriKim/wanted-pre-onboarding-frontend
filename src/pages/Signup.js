@@ -67,21 +67,19 @@ function Signup() {
         if (!res.ok) {
           throw res;
         }
-
+        return res.json();
+      })
+      .then((res) => {
         if (res.status === 201) {
           alert("회원가입이 완료되었습니다.");
           window.location.href = "/signin";
         }
       })
       .catch((error) => {
-        error.text().then((msg) => {
-          const errMsg = JSON.parse(msg).message;
-          alert(errMsg);
-
-          if (errMsg === "동일한 이메일이 이미 존재합니다.") {
-            window.location.href = "/signin";
-          }
-        });
+        if (error.status === 400) {
+          alert("동일한 이메일이 이미 존재합니다.");
+          window.location.reload();
+        }
       });
   };
 
