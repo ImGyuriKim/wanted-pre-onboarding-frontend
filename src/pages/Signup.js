@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
+import { access_token } from "../App";
+import { baseURL } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -39,7 +41,6 @@ const Container = styled.div`
 `;
 
 function Signup() {
-  const access_token = localStorage.getItem("access_token");
   // 리다이렉트 처리
   if (access_token) {
     alert("이미 로그인되어있습니다. Todo 페이지로 이동합니다.");
@@ -52,7 +53,7 @@ function Signup() {
   // 입력된 이메일, 비밀번호 상태관리
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
+
   // 회원가입 버튼 핸들러
   const handleSignUp = () => {
     fetch(`${baseURL}auth/signup`, {

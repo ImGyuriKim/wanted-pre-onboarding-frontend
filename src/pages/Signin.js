@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
+import { access_token } from "../App";
+import { baseURL } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -39,13 +41,12 @@ const Container = styled.div`
 `;
 
 function Signin() {
-  const access_token = localStorage.getItem("access_token");
   // 리다이렉트 처리
   if (access_token) {
     alert("이미 로그인되어있습니다. Todo 페이지로 이동합니다.");
     window.location.href = "/todo";
   }
-  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
+
   // 유효성 검사용 상태관리
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPwValid, setIsPwValid] = useState(false);

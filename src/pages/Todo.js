@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
+import { access_token } from "../App";
+import { baseURL } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -87,9 +89,6 @@ const EditContainer = styled.div`
 `;
 
 function Todo() {
-  const access_token = localStorage.getItem("access_token");
-  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
-
   // 로그인 여부에 따른 리다이렉트 처리
   if (!access_token) {
     alert("로그인 후 이용해주세요.");

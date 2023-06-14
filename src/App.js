@@ -7,6 +7,9 @@ import Todo from "./pages/Todo";
 import Nav from "./components/Nav";
 import React from "react";
 
+export const access_token = localStorage.getItem("access_token");
+export const baseURL = "https://www.pre-onboarding-selection-task.shop/";
+// 리다이렉트 처리
 function App() {
   return (
     <React.Fragment>
