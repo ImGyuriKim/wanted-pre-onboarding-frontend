@@ -88,12 +88,8 @@ const EditContainer = styled.div`
   }
 `;
 
-function Todo() {
-  // 로그인 여부에 따른 리다이렉트 처리
-  if (!access_token) {
-    alert("로그인 후 이용해주세요.");
-    window.location.href = "/signin";
-  }
+function Todo({ isLoggedIn }) {
+  isLoggedIn(access_token, window.location.pathname);
 
   // 기존 TODO 조회 - GET 요청
   useEffect(() => {

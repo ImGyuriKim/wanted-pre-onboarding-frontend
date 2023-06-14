@@ -40,12 +40,9 @@ const Container = styled.div`
   }
 `;
 
-function Signup() {
-  // 리다이렉트 처리
-  if (access_token) {
-    alert("이미 로그인되어있습니다. Todo 페이지로 이동합니다.");
-    window.location.href = "/todo";
-  }
+function Signup({ isLoggedIn }) {
+  isLoggedIn(access_token, window.location.pathname);
+
   // 유효성 검사용 상태관리
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPwValid, setIsPwValid] = useState(false);
