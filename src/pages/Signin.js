@@ -66,13 +66,10 @@ function Signin() {
       }),
     })
       .then((res) => {
-        if (res.status === 200) {
-          return res.json();
-        }
-
-        if (res.status === 401) {
+        if (!res.ok) {
           throw res;
         }
+        return res.json();
       })
       .then((res) => {
         localStorage.setItem("access_token", res.access_token);
@@ -80,13 +77,15 @@ function Signin() {
         window.location.href = "/todo";
       })
       .catch((error) => {
-        error.text().then((msg) => {
-          const errMsg = JSON.parse(msg).message;
-          if (errMsg === "Unauthorized") {
-            alert("이메일과 비밀번호를 다시 한번 확인해주세요.");
-            window.location.href = "/signin";
-          }
-        });
+        if (error.status === 401) {
+          alert("비밀번호를 다시 한번 확인해주세요.");
+          window.location.reload();
+        }
+
+        if (error.status === 404) {
+          alert("존재하지 않는 이메일입니다.");
+          window.location.reload();
+        }
       });
   };
 
