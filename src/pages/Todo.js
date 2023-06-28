@@ -220,6 +220,8 @@ function Todo({ isLoggedIn }) {
       <ul className="todoLists">
         {todos &&
           todos.map((todo) => {
+            console.log(todo);
+
             return isEditing && todoId === todo.id ? (
               <ListContainer key={todo.id}>
                 <EditContainer>
