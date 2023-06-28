@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
+import { access_token } from "../App";
+import { baseURL } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -38,13 +40,9 @@ const Container = styled.div`
   }
 `;
 
-function Signup() {
-  const access_token = localStorage.getItem("access_token");
-  // 리다이렉트 처리
-  if (access_token) {
-    alert("이미 로그인되어있습니다. Todo 페이지로 이동합니다.");
-    window.location.href = "/todo";
-  }
+function Signup({ isLoggedIn }) {
+  isLoggedIn(access_token, window.location.pathname);
+
   // 유효성 검사용 상태관리
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPwValid, setIsPwValid] = useState(false);
@@ -52,7 +50,7 @@ function Signup() {
   // 입력된 이메일, 비밀번호 상태관리
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
+
   // 회원가입 버튼 핸들러
   const handleSignUp = () => {
     fetch(`${baseURL}auth/signup`, {
@@ -67,21 +65,19 @@ function Signup() {
         if (!res.ok) {
           throw res;
         }
-
+        return res.json();
+      })
+      .then((res) => {
         if (res.status === 201) {
           alert("회원가입이 완료되었습니다.");
           window.location.href = "/signin";
         }
       })
       .catch((error) => {
-        error.text().then((msg) => {
-          const errMsg = JSON.parse(msg).message;
-          alert(errMsg);
-
-          if (errMsg === "동일한 이메일이 이미 존재합니다.") {
-            window.location.href = "/signin";
-          }
-        });
+        if (error.status === 400) {
+          alert("동일한 이메일이 이미 존재합니다.");
+          window.location.reload();
+        }
       });
   };
 

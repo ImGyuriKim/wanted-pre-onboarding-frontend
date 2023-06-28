@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useState } from "react";
+import { access_token } from "../App";
+import { baseURL } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -38,14 +40,9 @@ const Container = styled.div`
   }
 `;
 
-function Signin() {
-  const access_token = localStorage.getItem("access_token");
-  // 리다이렉트 처리
-  if (access_token) {
-    alert("이미 로그인되어있습니다. Todo 페이지로 이동합니다.");
-    window.location.href = "/todo";
-  }
-  const baseURL = "https://www.pre-onboarding-selection-task.shop/";
+function Signin({ isLoggedIn }) {
+  isLoggedIn(access_token, window.location.pathname);
+
   // 유효성 검사용 상태관리
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPwValid, setIsPwValid] = useState(false);
@@ -66,13 +63,10 @@ function Signin() {
       }),
     })
       .then((res) => {
-        if (res.status === 200) {
-          return res.json();
-        }
-
-        if (res.status === 401) {
+        if (!res.ok) {
           throw res;
         }
+        return res.json();
       })
       .then((res) => {
         localStorage.setItem("access_token", res.access_token);
@@ -80,13 +74,15 @@ function Signin() {
         window.location.href = "/todo";
       })
       .catch((error) => {
-        error.text().then((msg) => {
-          const errMsg = JSON.parse(msg).message;
-          if (errMsg === "Unauthorized") {
-            alert("이메일과 비밀번호를 다시 한번 확인해주세요.");
-            window.location.href = "/signin";
-          }
-        });
+        if (error.status === 401) {
+          alert("비밀번호를 다시 한번 확인해주세요.");
+          window.location.reload();
+        }
+
+        if (error.status === 404) {
+          alert("존재하지 않는 이메일입니다.");
+          window.location.reload();
+        }
       });
   };
 

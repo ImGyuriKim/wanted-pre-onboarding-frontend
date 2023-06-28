@@ -1,4 +1,5 @@
 import { styled } from "styled-components";
+import { access_token } from "../App";
 
 const Container = styled.div`
   display: flex;
@@ -14,8 +15,6 @@ const Container = styled.div`
 `;
 
 function Logout() {
-  const access_token = localStorage.getItem("access_token");
-
   const handleLogout = () => {
     if (access_token) {
       localStorage.clear();
