@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Logout from "./Logout";
+import { access_token } from "../App";
 
 const Conatiner = styled.div`
   display: flex;
@@ -19,7 +20,6 @@ const Conatiner = styled.div`
   }
 `;
 function Nav() {
-  const access_token = localStorage.getItem("access_token");
   return (
     <Conatiner>
       {access_token ? <Logout /> : <></>}
